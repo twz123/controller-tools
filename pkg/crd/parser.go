@@ -133,7 +133,7 @@ func (p *Parser) indexTypes(pkg *loader.Package) {
 		if skipPkg := pkgMarkers.Get("kubebuilder:skip"); skipPkg != nil {
 			return
 		}
-		if nameVal := pkgMarkers.Get("groupName"); nameVal != nil {
+		if nameVal, ok := pkgMarkers.Get("groupName").(*string); ok && nameVal != nil {
 			versionVal := pkg.Name // a reasonable guess
 			if versionMarker := pkgMarkers.Get("versionName"); versionMarker != nil {
 				versionVal = versionMarker.(string)
@@ -141,7 +141,7 @@ func (p *Parser) indexTypes(pkg *loader.Package) {
 
 			p.GroupVersions[pkg] = schema.GroupVersion{
 				Version: versionVal,
-				Group:   nameVal.(string),
+				Group:   *nameVal,
 			}
 		}
 	}

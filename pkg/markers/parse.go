@@ -776,7 +776,7 @@ func (d *Definition) loadFields() error {
 		// anonymous field type
 		argType, err := ArgumentFromType(d.Output)
 		if err != nil {
-			return err
+			return fmt.Errorf("bad output type %s: %w", d.Output, err)
 		}
 		d.Fields[""] = argType
 		d.FieldNames[""] = ""
@@ -935,10 +935,23 @@ func (d *Definition) Parse(rawMarker string) (interface{}, error) {
 // fields in Definition).  Other values will have a single, empty-string-named Fields
 // entry.
 func MakeDefinition(name string, target TargetType, output interface{}) (*Definition, error) {
+	return makeDefinition(name, target, reflect.TypeOf(output))
+}
+
+// MakeDefinition constructs a definition from a name and type, using the type
+// parameter as the output type. All such definitions are strict by default.  If
+// the output type is a struct, its public fields will automatically be
+// populated into Fields (and similar fields in Definition).  Other values will
+// have a single, empty-string-named Fields entry.
+func MakeDefinitionFor[T any](name string, target TargetType) (*Definition, error) {
+	return makeDefinition(name, target, reflect.TypeFor[T]())
+}
+
+func makeDefinition(name string, target TargetType, output reflect.Type) (*Definition, error) {
 	def := &Definition{
 		Name:   name,
 		Target: target,
-		Output: reflect.TypeOf(output),
+		Output: output,
 		Strict: true,
 	}
 

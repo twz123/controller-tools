@@ -22,7 +22,7 @@ import (
 
 func init() {
 	AllDefinitions = append(AllDefinitions,
-		must(markers.MakeDefinition("groupName", markers.DescribesPackage, "")).
+		must(markers.MakeDefinitionFor[*string]("groupName", markers.DescribesPackage)).
 			WithHelp(markers.SimpleHelp("CRD", "specifies the API group name for this package.")),
 
 		must(markers.MakeDefinition("versionName", markers.DescribesPackage, "")).
